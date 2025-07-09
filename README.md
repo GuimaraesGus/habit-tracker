@@ -14,6 +14,7 @@ API RESTful para gerenciamento de hábitos pessoais. Permite criar, listar, atua
 - Lombok
 - MapStruct
 - Swagger/OpenAPI (springdoc)
+- PlantUML
 - JUnit 5 + Mockito (testes unitários)
 - Maven
 
@@ -29,23 +30,28 @@ habit-tracker/
 │       ├── 01-init-schema.sql
 │       └── 02-init-data.sql
 │
-├── src/
-│   ├── main/
-│   │   ├── java/com/example/habittracker/
-│   │   │   ├── controller/        # HabitController
-│   │   │   ├── dto/               # HabitDTO, HabitCreateDTO
-│   │   │   ├── entity/            # Habit.java
-│   │   │   ├── exception/         # GlobalExceptionHandler
-│   │   │   ├── mapper/            # HabitMapper
-│   │   │   ├── repository/        # HabitRepository
-│   │   │   ├── service/           # HabitService + export
-│   │   │   └── config/            # Swagger & Jackson config
-│   │   └── resources/
-│   │       └── application.yml
-│   └── export/                    # Json exportado
-│   └── test/
-│       ├── controller/            # Testes de API
-│       └── service/               # Testes unitários
+├── docs/                          # PUML dos diagramas de sequência e do desenho da solução
+│   └── images/                    # PNG da documentação
+│
+├── export/                        # Json exportado
+│
+└── src/
+    ├── main/
+    │   ├── java/com/example/habittracker/
+    │   │   ├── controller/        # HabitController
+    │   │   ├── dto/               # HabitDTO, HabitCreateDTO
+    │   │   ├── entity/            # Habit.java
+    │   │   ├── exception/         # GlobalExceptionHandler
+    │   │   ├── mapper/            # HabitMapper
+    │   │   ├── repository/        # HabitRepository
+    │   │   ├── service/           # HabitService + export
+    │   │   └── config/            # Swagger & Jackson config
+    │   └── resources/
+    │       └── application.yml
+    └── test/
+        └── java/com/example/habittracker/
+            ├── controller/        # Testes de API
+            └── service/           # Testes unitários
 ```
 
 ---
