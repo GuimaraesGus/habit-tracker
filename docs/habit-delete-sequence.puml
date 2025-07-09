@@ -1,0 +1,24 @@
+@startuml
+title Diagrama de Sequência - Remoção de Hábito
+
+actor User
+participant "HabitController" as Controller
+participant "HabitService" as Service
+participant "HabitRepository" as Repository
+participant "HabitExportService" as Exporter
+database "PostgreSQL DB" as DB
+
+User -> Controller : DELETE /habits/{id}
+Controller -> Service : delete(id)
+Service -> Repository : findById(id)
+Repository -> DB : SELECT * FROM habit WHERE id = ?
+DB --> Repository : Habit
+Repository --> Service : Habit
+Service -> Repository : delete(Habit)
+Repository -> DB : DELETE FROM habit WHERE id = ?
+DB --> Repository : void
+Service -> Exporter : exportModifiedHabits()
+Exporter --> Service : void
+Service --> Controller : void
+Controller --> User : 204 No Content
+@enduml

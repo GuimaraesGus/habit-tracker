@@ -1,0 +1,21 @@
+@startuml
+title Diagrama de Sequência - Buscar Hábito por ID
+
+actor User
+participant "HabitController" as Controller
+participant "HabitService" as Service
+participant "HabitMapper" as Mapper
+participant "HabitRepository" as Repository
+database "PostgreSQL DB" as DB
+
+User -> Controller : GET /habits/{id}
+Controller -> Service : findById(id)
+Service -> Repository : findById(id)
+Repository -> DB : SELECT * FROM habit WHERE id = ?
+DB --> Repository : Habit
+Repository --> Service : Habit
+Service -> Mapper : toDTO(Habit)
+Mapper --> Service : HabitDTO
+Service --> Controller : HabitDTO
+Controller --> User : 200 OK + HabitDTO
+@enduml

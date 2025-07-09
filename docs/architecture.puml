@@ -1,0 +1,32 @@
+@startuml HabitTrackerArchitecture
+
+skinparam componentStyle rectangle
+
+package "Frontend / API Consumer" {
+    [Swagger UI] 
+    [VSCode Debugger]
+}
+
+package "Spring Boot Application" {
+    [HabitController] <<REST Controller>>
+    [HabitService] <<Service>>
+    [HabitMapper] <<MapStruct>>
+    [HabitRepository] <<JPA Repository>>
+    [HabitEntity] <<Entity>>
+    [HabitDTO] <<DTO>>
+}
+
+database "PostgreSQL (Docker)" as db
+
+[Swagger UI] --> [HabitController] : Call REST APIs
+[VSCode Debugger] --> [HabitController] : Dev/Test
+
+[HabitController] --> [HabitService] : Invoke business logic
+[HabitService] --> [HabitRepository] : Access DB
+[HabitService] --> [HabitMapper] : Convert DTO <-> Entity
+
+[HabitRepository] --> db : JPA/Hibernate
+[HabitMapper] --> [HabitDTO]
+[HabitMapper] --> [HabitEntity]
+
+@enduml

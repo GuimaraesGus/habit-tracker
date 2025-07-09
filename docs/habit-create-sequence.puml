@@ -1,0 +1,28 @@
+@startuml
+title Diagrama de Sequência - Criação de Hábito
+
+actor User
+participant "HabitController" as Controller
+participant "HabitService" as Service
+participant "HabitMapper" as Mapper
+participant "HabitRepository" as Repository
+participant "HabitExportService" as Exporter
+database "PostgreSQL DB" as DB
+
+User -> Controller : POST /habits (HabitDTO)
+activate Controller
+Controller -> Service : create(HabitDTO)
+activate Service
+Service -> Mapper : toEntity(HabitDTO)
+Mapper --> Service : Habit
+Service -> Repository : save(Habit)
+Repository -> DB : INSERT INTO habit
+DB --> Repository : Saved Habit
+Repository --> Service : Habit
+Service -> Mapper : toDTO(Habit)
+Mapper --> Service : HabitDTO
+Service -> Exporter : exportModifiedHabits()
+Exporter --> Service : void
+Service --> Controller : HabitDTO
+Controller --> User : 201 Created
+@enduml

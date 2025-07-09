@@ -1,0 +1,30 @@
+@startuml
+title Diagrama de Sequência - Atualização de Hábito
+
+actor User
+participant "HabitController" as Controller
+participant "HabitService" as Service
+participant "HabitMapper" as Mapper
+participant "HabitRepository" as Repository
+participant "HabitExportService" as Exporter
+database "PostgreSQL DB" as DB
+
+User -> Controller : PUT /habits/{id} (HabitDTO)
+Controller -> Service : update(id, HabitDTO)
+Service -> Repository : findById(id)
+Repository -> DB : SELECT * FROM habit WHERE id = ?
+DB --> Repository : Habit
+Repository --> Service : Habit
+Service -> Mapper : toEntity(HabitDTO)
+Mapper --> Service : Habit (updated)
+Service -> Repository : save(Habit)
+Repository -> DB : UPDATE habit
+DB --> Repository : Updated Habit
+Repository --> Service : Habit
+Service -> Mapper : toDTO(Habit)
+Mapper --> Service : HabitDTO
+Service -> Exporter : exportModifiedHabits()
+Exporter --> Service : void
+Service --> Controller : HabitDTO
+Controller --> User : 200 OK + HabitDTO
+@enduml
