@@ -1,21 +1,25 @@
 @startuml
 title Diagrama de Sequência - Listagem de Hábitos
 
-actor User
-participant "HabitController" as Controller
-participant "HabitService" as Service
-participant "HabitMapper" as Mapper
-participant "HabitRepository" as Repository
-database "PostgreSQL DB" as DB
+actor Client
 
-User -> Controller : GET /habits
+participant "HabitController" as Controller <<Controller>>
+participant "HabitService" as Service <<Service>>
+participant "HabitMapper" as Mapper <<Control>>
+participant "HabitRepository" as Repository <<Repository>>
+database "PostgreSQL DB" as DB <<Database>>
+
+Client -> Controller : GET /habits
 Controller -> Service : findAll()
+
 Service -> Repository : findAll()
-Repository -> DB : SELECT * FROM habit
+Repository -> DB : SELECT * FROM habits
 DB --> Repository : List<Habit>
 Repository --> Service : List<Habit>
-Service -> Mapper : toDTO(habit) x N
-Mapper --> Service : List<HabitDTO>
+
+Service -> Mapper : toDTO(Habit) [loop]
+Mapper --> Service : HabitDTO [loop]
+
 Service --> Controller : List<HabitDTO>
-Controller --> User : 200 OK + Lista
+Controller --> Client : 200 OK\nBody: List<HabitDTO>
 @enduml

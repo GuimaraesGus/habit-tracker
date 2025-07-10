@@ -1,28 +1,43 @@
 @startuml
 title Diagrama de Sequência - Criação de Hábito
 
-actor User
-participant "HabitController" as Controller
-participant "HabitService" as Service
-participant "HabitMapper" as Mapper
-participant "HabitRepository" as Repository
-participant "HabitExportService" as Exporter
-database "PostgreSQL DB" as DB
+actor Client
 
-User -> Controller : POST /habits (HabitDTO)
-activate Controller
-Controller -> Service : create(HabitDTO)
-activate Service
-Service -> Mapper : toEntity(HabitDTO)
+participant "HabitController" as Controller <<Controller>>
+participant "HabitService" as Service <<Service>>
+participant "HabitMapper" as Mapper <<Control>>
+participant "HabitRepository" as Repository <<Repository>>
+participant "HabitExportService" as ExportService <<Service>>
+database "PostgreSQL DB" as DB <<Database>>
+collections "/habit-tracker/export/ \n habits-export-{timestamp}.json" as File <<File>>
+
+Client -> Controller : POST /habits\nBody: HabitCreateDTO
+Controller -> Service : create(HabitCreateDTO)
+
+Service -> Mapper : toEntity(HabitCreateDTO)
 Mapper --> Service : Habit
+
 Service -> Repository : save(Habit)
-Repository -> DB : INSERT INTO habit
-DB --> Repository : Saved Habit
+Repository -> DB : INSERT INTO habits ...
+DB --> Repository : Habit
 Repository --> Service : Habit
-Service -> Mapper : toDTO(Habit)
-Mapper --> Service : HabitDTO
-Service -> Exporter : exportModifiedHabits()
-Exporter --> Service : void
-Service --> Controller : HabitDTO
-Controller --> User : 201 Created
+
+alt Hábito com dados ok
+  Service -> ExportService : exportModifiedHabits()
+  ExportService -> Repository : findAll()
+  Repository -> DB : SELECT * FROM habits
+  DB --> Repository : List<Habit>
+  Repository --> ExportService : List<Habit>
+  ExportService -> File : Cria arquivo JSON
+  ExportService --> Service : void
+
+  Service -> Mapper : toDTO(Habit)
+  Mapper --> Service : HabitDTO
+
+  Service --> Controller : HabitDTO
+  Controller --> Client : 201 Created\nBody: HabitDTO
+else Dados inconsistentes
+  Service --> Controller : lança exceção
+  Controller --> Client : 400 Bad Request\n"Violação de integridade dos dados"
+end
 @enduml

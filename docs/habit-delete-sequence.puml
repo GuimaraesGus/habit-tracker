@@ -1,24 +1,40 @@
 @startuml
 title Diagrama de Sequência - Remoção de Hábito
 
-actor User
-participant "HabitController" as Controller
-participant "HabitService" as Service
-participant "HabitRepository" as Repository
-participant "HabitExportService" as Exporter
-database "PostgreSQL DB" as DB
+actor Client
 
-User -> Controller : DELETE /habits/{id}
+participant "HabitController" as Controller <<Controller>>
+participant "HabitService" as Service <<Service>>
+participant "HabitMapper" as Mapper <<Control>>
+participant "HabitRepository" as Repository <<Repository>>
+participant "HabitExportService" as ExportService <<Service>>
+database "PostgreSQL DB" as DB <<Database>>
+collections "/habit-tracker/export/ \n habits-export-{timestamp}.json" as File <<File>>
+
+Client -> Controller : DELETE /habits/{id}
 Controller -> Service : delete(id)
+
 Service -> Repository : findById(id)
-Repository -> DB : SELECT * FROM habit WHERE id = ?
-DB --> Repository : Habit
-Repository --> Service : Habit
-Service -> Repository : delete(Habit)
-Repository -> DB : DELETE FROM habit WHERE id = ?
-DB --> Repository : void
-Service -> Exporter : exportModifiedHabits()
-Exporter --> Service : void
-Service --> Controller : void
-Controller --> User : 204 No Content
+Repository -> DB : SELECT * FROM habits WHERE id = ?
+DB --> Repository : Optional<Habit>
+Repository --> Service : Optional<Habit>
+
+alt Hábito encontrado
+  Service -> Repository : delete(Habit)
+  Repository -> DB : DELETE FROM habits WHERE id = ?
+  DB --> Repository : sucesso
+  Repository --> Service : void
+  Service -> ExportService : exportModifiedHabits()
+  ExportService -> Repository : findAll()
+  Repository -> DB : SELECT * FROM habits
+  DB --> Repository : List<Habit>
+  Repository --> ExportService : List<Habit>
+  ExportService -> File : Cria arquivo JSON
+  ExportService --> Service : void
+  Service --> Controller : void
+  Controller --> Client : 204 No Content\n(Hábito deletado com sucesso)
+else Não encontrado
+  Service --> Controller : lança exceção
+  Controller --> Client : 404 Not Found\n"Hábito não encontrado"
+end
 @enduml

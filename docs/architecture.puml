@@ -1,32 +1,65 @@
 @startuml HabitTrackerArchitecture
 
-skinparam componentStyle rectangle
+title Habit Tracker - Arquitetura de Solução
+
+skinparam rectangle {
+  BackgroundColor<<REST Controller>> LightBlue
+  BackgroundColor<<Service>> LightGreen
+  BackgroundColor<<JPA Repository>> Wheat
+  BackgroundColor<<MapStruct>> LightYellow
+  BackgroundColor<<DTO>> MistyRose
+  BackgroundColor<<Entity>> Thistle
+}
 
 package "Frontend / API Consumer" {
-    [Swagger UI] 
-    [VSCode Debugger]
+    rectangle "Swagger UI" 
+    rectangle "VSCode Debugger"
 }
 
-package "Spring Boot Application" {
-    [HabitController] <<REST Controller>>
-    [HabitService] <<Service>>
-    [HabitMapper] <<MapStruct>>
-    [HabitRepository] <<JPA Repository>>
-    [HabitEntity] <<Entity>>
-    [HabitDTO] <<DTO>>
+package "Java + Spring Boot Application" {
+    package "API Layer" {
+        rectangle "HabitController" <<REST Controller>>
+    }
+
+    package "Service Layer" {
+        rectangle "HabitService" <<Service>>
+        rectangle "HabitExportService" <<Service>>
+    }
+
+    package "Data Access Layer" {
+        rectangle "HabitMapper" <<MapStruct>>
+        rectangle "HabitRepository" <<JPA Repository>>
+    }
+
+    package "Model" {
+        rectangle "HabitEntity" <<Entity>>
+        rectangle "HabitDTO" <<DTO>>
+    }
 }
 
-database "PostgreSQL (Docker)" as db
+package "Infrastructure" {
+    folder "filesystem (habit-tracker/export/)" {
+        file "habits-export-{timestamp}.json" <<File>>
+    }
+}
 
-[Swagger UI] --> [HabitController] : Call REST APIs
+package "Docker" {
+    package "Database" {
+        database "PostgreSQL" as db
+    }
+}
+
+[Swagger UI] --> [HabitController] : Chama REST APIs
 [VSCode Debugger] --> [HabitController] : Dev/Test
 
-[HabitController] --> [HabitService] : Invoke business logic
-[HabitService] --> [HabitRepository] : Access DB
-[HabitService] --> [HabitMapper] : Convert DTO <-> Entity
+[HabitController] --> [HabitService] : Chama lógica de negócio
+[HabitService] --> [HabitRepository] : Acessa DB
+[HabitService] --> [HabitMapper] : Converte \n DTO <-> Entity
+[HabitService] -> [HabitExportService] : Acessa para exportar dados \n caso alteração no bd
+[HabitExportService] --> "habits-export-{timestamp}.json" : Cria JSON
 
-[HabitRepository] --> db : JPA/Hibernate
-[HabitMapper] --> [HabitDTO]
-[HabitMapper] --> [HabitEntity]
+[HabitRepository] --> db : JPA/Hibernate \n CRUD
+[HabitMapper] --> [HabitDTO] : mapeia para
+[HabitMapper] --> [HabitEntity] : mapeia de
 
 @enduml

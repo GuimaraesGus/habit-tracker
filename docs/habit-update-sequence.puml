@@ -1,30 +1,49 @@
 @startuml
-title Diagrama de Sequência - Atualização de Hábito
+actor Client
 
-actor User
-participant "HabitController" as Controller
-participant "HabitService" as Service
-participant "HabitMapper" as Mapper
-participant "HabitRepository" as Repository
-participant "HabitExportService" as Exporter
-database "PostgreSQL DB" as DB
+participant "HabitController" as Controller <<Controller>>
+participant "HabitService" as Service <<Service>>
+participant "HabitMapper" as Mapper <<Control>>
+participant "HabitRepository" as Repository <<Repository>>
+participant "HabitExportService" as ExportService <<Service>>
+database "PostgreSQL DB" as DB <<Database>>
+collections "/habit-tracker/export/ \n habits-export-{timestamp}.json" as File <<File>>
 
-User -> Controller : PUT /habits/{id} (HabitDTO)
-Controller -> Service : update(id, HabitDTO)
+Client -> Controller : PUT /habits/{id}\nBody: HabitUpdateDTO
+Controller -> Service : update(id, HabitUpdateDTO)
+
 Service -> Repository : findById(id)
-Repository -> DB : SELECT * FROM habit WHERE id = ?
-DB --> Repository : Habit
-Repository --> Service : Habit
-Service -> Mapper : toEntity(HabitDTO)
-Mapper --> Service : Habit (updated)
-Service -> Repository : save(Habit)
-Repository -> DB : UPDATE habit
-DB --> Repository : Updated Habit
-Repository --> Service : Habit
-Service -> Mapper : toDTO(Habit)
-Mapper --> Service : HabitDTO
-Service -> Exporter : exportModifiedHabits()
-Exporter --> Service : void
-Service --> Controller : HabitDTO
-Controller --> User : 200 OK + HabitDTO
+Repository -> DB : SELECT * FROM habits WHERE id = ?
+DB --> Repository : Optional<Habit>
+Repository --> Service : Optional<Habit>
+
+alt Hábito encontrado
+  Service -> Mapper : toEntity(HabitDTO)
+  Mapper --> Service : Habit (atualizado)
+  
+  Service -> Repository : save(Habit)
+  Repository -> DB : UPDATE habits SET ... WHERE id = ?
+  DB --> Repository : Habit
+  Repository --> Service : Habit
+
+  alt Hábito com dados ok
+    Service -> ExportService : exportModifiedHabits()
+    ExportService -> Repository : findAll()
+    Repository -> DB : SELECT * FROM habits
+    DB --> Repository : List<Habit>
+    Repository --> ExportService : List<Habit>
+    ExportService -> File : Cria arquivo JSON
+    ExportService --> Service : void
+    
+    Service --> Controller : void
+    Controller --> Client : 204 No Content\n(Hábito atualizado com sucesso)
+  else Dados inconsistentes
+    Service --> Controller : lança exceção
+    Controller --> Client : 400 Bad Request\n"Violação de integridade dos dados"
+  end
+
+else Não encontrado
+  Service --> Controller : lança exceção
+  Controller --> Client : 404 Not Found\n"Hábito não encontrado"
+end
 @enduml
