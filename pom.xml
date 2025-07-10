@@ -90,7 +90,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.example.habittracker.HabitTrackerApplication</mainClass>
+                    <mainClass>com.api.habittracker.HabitTrackerApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>

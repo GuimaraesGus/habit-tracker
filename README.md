@@ -37,7 +37,7 @@ habit-tracker/
 │
 └── src/
     ├── main/
-    │   ├── java/com/example/habittracker/
+    │   ├── java/com/api/habittracker/
     │   │   ├── controller/        # HabitController
     │   │   ├── dto/               # HabitDTO, HabitCreateDTO
     │   │   ├── entity/            # Habit.java
@@ -49,7 +49,7 @@ habit-tracker/
     │   └── resources/
     │       └── application.yml
     └── test/
-        └── java/com/example/habittracker/
+        └── java/com/api/habittracker/
             ├── controller/        # Testes de API
             └── service/           # Testes unitários
 ```
