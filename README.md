@@ -68,7 +68,7 @@ habit-tracker/
 │           ├── controller/        # Testes de API
 │           └── service/           # Testes unitários
 │
-└── pom.xml                # Configuração do Maven
+└── pom.xml                        # Configuração do Maven
 ```
 
 ---
@@ -107,23 +107,7 @@ Após iniciar o projeto, acesse a documentação interativa em:
 
 ---
 
-## 🧪 Testes
-
-Execute os testes unitários com:
-
-```bash
-mvn test
-```
-
-Os testes incluem:
-- Verificação de regras de negócio nos serviços
-- Mock de dependências com Mockito
-- Cobertura para criação, busca, atualização e exclusão de hábitos
-
----
-
-
-## 🧪 Endpoints principais
+## 🚀 Endpoints principais
 
 | Método | Endpoint          | Descrição                  |
 |--------|-------------------|----------------------------|
@@ -145,6 +129,20 @@ habit-tracker/export/habits-export-{timestamp-atual}.json
 
 ---
 
+## 🧪 Testes
+
+Execute os testes unitários com:
+
+```bash
+mvn test
+```
+
+Os testes incluem:
+- Verificação de regras de negócio nos serviços
+- Mock de dependências com Mockito
+- Cobertura para criação, busca, atualização e exclusão de hábitos
+
+---
 
 ## ⚠️ Tratamento de Erros
 
